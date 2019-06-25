@@ -1,4 +1,6 @@
 import pygame
+import random
+from entity_module import *
 
 
 class Board:
@@ -9,6 +11,16 @@ class Board:
         self._top = top
         self._left = left
         self.board = [[[] for __ in range(cols)] for _ in range(rows)]
+
+    def move(self):  # Only moves animals and watchers on board. Doesnt move them on screen and doesnt check interactions.
+        new_board = [[[] for __ in range(self._cols)] for _ in range(self._rows)]
+        for i, row in enumerate(self.board):
+            for j, elem in enumerate(row):
+                for entity in elem:
+                    new_i, new_j = entity.move(i, j, self._rows, self._cols)
+                    new_board[new_i][new_j].append(entity)
+
+        self.board = new_board
 
     def render(self, screen):
         pygame.draw.rect(screen, pygame.Color('Black'),
@@ -24,9 +36,8 @@ class Board:
                           (self._cell_size, self._cell_size)), 1)
 
         for sprite in cell:
-            sprite.rect.x = self._left + self._cell_size*pos[1] + 2
-            sprite.rect.y = self._top + self._cell_size*pos[0] + 2
-
+            sprite.rect.x = self._left + self._cell_size * pos[1] + 2
+            sprite.rect.y = self._top + self._cell_size * pos[0] + 2
 
     def get_cell(self, left, top):
         top_cell = (top - self._top) // self._cell_size
