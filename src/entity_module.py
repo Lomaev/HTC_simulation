@@ -32,19 +32,21 @@ class BaseAnimal(pygame.sprite.Sprite):
         self.name = name
 
     def move(self, i, j, rows, cols):
-        if i > 0 and random.randint(1, 4) == 1:
-            print('Animal', self.name, 'moved from', i, j, 'to', i - 1, j)
-            return i - 1, j
-        elif i < rows - 1 and random.randint(1, 3) == 1:
-            print('Animal', self.name, 'moved from', i, j, 'to', i + 1, j)
-            return i + 1, j
-        elif j < cols - 1 and (random.randint(1, 2) == 1 or j == 0):
-            print('Animal', self.name, 'moved from', i, j, 'to', i, j + 1)
-            return i, j + 1
-        else:
-            print('Animal', self.name, 'moved from', i, j, 'to', i, j - 1)
-            return i, j - 1
+        print('Animal', self.name, 'moved from', i, j, 'to', end=' ')
+        off_i, off_j = random.choice([(-1, 0), (1, 0), (0, -1), (0, 1)])
+        i += off_i
+        j += off_j
+        if i < 0:
+            i = rows + i
+        elif i == rows:
+            i = 0
+        if j < 0:
+            j = cols + j
+        elif j == cols:
+            j = 0
+        print(i, j)
 
+        return i, j
 
 class GrassFeeding(BaseAnimal):
     def __init__(self, group, power, name, size):  # kind - grass-feeding or predator, size - size of sprite rect.
