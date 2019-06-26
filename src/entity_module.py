@@ -4,6 +4,7 @@ import random
 
 
 def load_image(name, colorkey=None):
+    print(name, 'loaded.')
     if type(name) != str:
         fullname = os.path.join('data', *name)
     else:
@@ -22,12 +23,20 @@ def load_image(name, colorkey=None):
         raise SystemExit(message)
 
 
-class BaseAnimal(pygame.sprite.Sprite):
-    def __init__(self, group, kind, power, name, size):  # kind - grass-feeding or predator, size - size of sprite rect.
+class ImageLoader:
+    img = None
+
+    @classmethod
+    def get_class_image(cls, image_name):
+        if not cls.img:
+            cls.img = load_image(image_name, colorkey=-1)
+
+        return cls.img
+
+
+class BaseAnimal(pygame.sprite.Sprite, ImageLoader):
+    def __init__(self, group, power, name):
         super().__init__(group)
-        self.image = pygame.transform.scale(load_image('cat.jpg', colorkey=-1), (size, size))
-        self.rect = self.image.get_rect()
-        self.kind = kind
         self.power = power
         self.name = name
 
@@ -48,24 +57,32 @@ class BaseAnimal(pygame.sprite.Sprite):
 
         return i, j
 
+
+class SmallPredator(BaseAnimal):
+    def __init__(self, group, power, name, size):
+        super().__init__(group, power, name)
+        self.image = pygame.transform.scale(self.get_class_image('cat.jpg'), (size, size))
+        self.rect = self.image.get_rect()
+
+
 class GrassFeeding(BaseAnimal):
-    def __init__(self, group, power, name, size):  # kind - grass-feeding or predator, size - size of sprite rect.
-        super().__init__(group, 'grass-feeding', power, name, size)
-        self.image = pygame.transform.scale(load_image('grass-feeding.jpg', colorkey=-1), (size, size))
+    def __init__(self, group, power, name, size):
+        super().__init__(group, power, name)
+        self.image = pygame.transform.scale(self.get_class_image('grass-feeding.jpg'), (size, size))
         self.rect = self.image.get_rect()
 
 
 class BigAnimal(BaseAnimal):
-    def __init__(self, group, power, name, size):  # kind - grass-feeding or predator, size - size of sprite rect.
-        super().__init__(group, 'big', power, name, size)
-        self.image = pygame.transform.scale(load_image('lion.jpg', colorkey=-1), (size, size))
+    def __init__(self, group, power, name, size):
+        super().__init__(group, power, name)
+        self.image = pygame.transform.scale(self.get_class_image('lion.jpg'), (size, size))
         self.rect = self.image.get_rect()
 
 
-class Plant(pygame.sprite.Sprite):
+class Plant(pygame.sprite.Sprite, ImageLoader):
     def __init__(self, group, food_value, name, size):
         super().__init__(group)
-        self.image = pygame.transform.scale(load_image('plant.jpg', colorkey=-1), (size, size))
+        self.image = pygame.transform.scale(self.get_class_image('plant.jpg'), (size, size))
         self.rect = self.image.get_rect()
         self.food_value = food_value
         self.name = name
@@ -74,10 +91,10 @@ class Plant(pygame.sprite.Sprite):
         return i, j
 
 
-class Watcher(pygame.sprite.Sprite):
+class Watcher(pygame.sprite.Sprite, ImageLoader):
     def __init__(self, group, name, size):
         super().__init__(group)
-        self.image = pygame.transform.scale(load_image('man.jpg', colorkey=-1), (size, size))
+        self.image = pygame.transform.scale(self.get_class_image('man.jpg'), (size, size))
         self.rect = self.image.get_rect()
         self.name = name
 

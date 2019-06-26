@@ -13,12 +13,14 @@ screen = pygame.display.set_mode((700, 700))
 
 all_sprites = pygame.sprite.Group()
 
-for i in range(5):
-    board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(BaseAnimal(all_sprites, 'normal', 1000, str(i+1), 65))
+for i in range(3):
+    board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(GrassFeeding(all_sprites, 1000, str(i+4), 65))
+for i in range(3):
+    board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(SmallPredator(all_sprites, 1000, str(i+1), 65))
 for i in range(5):
     board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(Plant(all_sprites, 1000, 'kust', 65))
 
-board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(Watcher(all_sprites, 'Test', 65))
+#board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(Watcher(all_sprites, 'Test', 65))
 
 move_clock = pygame.time.Clock()
 move_time = 0

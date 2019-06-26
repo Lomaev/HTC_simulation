@@ -66,10 +66,3 @@ class Board:
         else:
             hero.kill()
             return False
-
-    def update_heroes(self):
-        old_board = [i.copy() for i in self.board]
-        for i, row in enumerate(old_board):
-            for j, elem in enumerate(row):
-                if elem:
-                    elem.move(self, i, j)
