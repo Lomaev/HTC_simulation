@@ -37,6 +37,7 @@ class ImageLoader:
 class BaseAnimal(pygame.sprite.Sprite, ImageLoader):
     def __init__(self, group, power, name):
         super().__init__(group)
+        self.alive = True
         self.power = power
         self.name = name
 
@@ -64,6 +65,18 @@ class SmallPredator(BaseAnimal):
         self.image = pygame.transform.scale(self.get_class_image('cat.jpg'), (size, size))
         self.rect = self.image.get_rect()
 
+    def check_interaction(self, target):
+        if type(target) == GrassFeeding and target.alive and target.power < self.power:
+            print('Small predator', self.name, 'eat', target.name)
+            if self.power + target.power // 2 < 200:
+                self.power += target.power // 2
+            else:
+                self.power = 200
+            target.alive = False
+            return True
+        else:
+            return False
+
 
 class GrassFeeding(BaseAnimal):
     def __init__(self, group, power, name, size):
@@ -71,17 +84,51 @@ class GrassFeeding(BaseAnimal):
         self.image = pygame.transform.scale(self.get_class_image('grass-feeding.jpg'), (size, size))
         self.rect = self.image.get_rect()
 
+    def check_interaction(self, target):
+        if type(target) == Plant and target.alive:
+            print('Grass feeding', self.name, 'eat plant', target.name)
+            if self.power + target.food_value < 400:
+                self.power += target.food_value
+            else:
+                self.power = 400
+            target.alive = False
+            return True
+        else:
+            return False
 
-class BigAnimal(BaseAnimal):
+
+class BigPredator(BaseAnimal):
     def __init__(self, group, power, name, size):
         super().__init__(group, power, name)
         self.image = pygame.transform.scale(self.get_class_image('lion.jpg'), (size, size))
         self.rect = self.image.get_rect()
 
+    def check_interaction(self, target):
+        if target is self:
+            return False
+        if (type(target) == GrassFeeding or type(
+                target) == SmallPredator) and target.alive and target.power < self.power:
+            print('Big predator', self.name, 'eat', type(target), 'with power', target.power)
+            if self.power + target.power // 2 < 300:
+                self.power += target.power // 2
+            else:
+                self.power = 300
+            target.alive = False
+            return True
+        elif type(target) == BigPredator and random.randint(0, 1):
+            print('Big predator', self.name, 'hit', target.name, 'decreasing his power by', self.power // 2)
+            target.power -= self.power // 2
+            if target.power <= 0:
+                target.alive = False
+            return True
+        else:
+            return False
+
 
 class Plant(pygame.sprite.Sprite, ImageLoader):
     def __init__(self, group, food_value, name, size):
         super().__init__(group)
+        self.alive = True
         self.image = pygame.transform.scale(self.get_class_image('plant.jpg'), (size, size))
         self.rect = self.image.get_rect()
         self.food_value = food_value
@@ -89,6 +136,9 @@ class Plant(pygame.sprite.Sprite, ImageLoader):
 
     def move(self, i, j, rows, cols):
         return i, j
+
+    def check_interaction(self, target):
+        return True
 
 
 class Watcher(pygame.sprite.Sprite, ImageLoader):
@@ -102,3 +152,10 @@ class Watcher(pygame.sprite.Sprite, ImageLoader):
         new_i, new_j = random.randint(0, rows - 1), random.randint(0, cols - 1)
         print('Watcher', self.name, 'moved from', i, j, 'to', new_i, new_j)
         return new_i, new_j
+
+    def check_interaction(self, target):
+        if target is not self and target.alive:
+            print('Watcher', self.name, 'see', type(target), 'and name it', target.name)
+        if type(target) == Plant:
+            target.alive = False
+        return False
