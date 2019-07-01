@@ -1,16 +1,12 @@
-import pygame
+# import pygame
 import random
 from entity_module import *
 
 
 class Board:
-    def __init__(self, cols, rows, cell_size, top, left, grassfeeding_count, sprite_group):
+    def __init__(self, cols, rows, grassfeeding_count):
         self._cols = cols
         self._rows = rows
-        self._cell_size = cell_size
-        self._top = top
-        self._left = left
-        self.sprite_group = sprite_group
         self.grassfeeding_count = grassfeeding_count
         self.board = [[[] for __ in range(cols)] for _ in range(rows)]
 
@@ -38,8 +34,7 @@ class Board:
                         new_board[i][j].append(entity)
                     elif type(entity) == Plant:
                         new_board[random.randint(0, self._rows - 1)][random.randint(0, self._cols - 1)].append(
-                            Plant(self.sprite_group, random.randint(0, 40), random.randint(100, 200),
-                                  self._cell_size - 5))
+                            Plant(random.randint(0, 40), random.randint(100, 200)))
                         entity.kill()
                     else:
                         if type(entity) == GrassFeeding:
@@ -48,22 +43,14 @@ class Board:
 
         self.board = new_board
 
-    def render(self, screen):
-        pygame.draw.rect(screen, pygame.Color('Black'),
-                         ((self._left, self._top),
-                          (self._cell_size * self._cols, self._cell_size * self._rows)), 2)
+    def to_json_model(self):  # TODO normal view model.
+        new_board = [[[] for __ in range(self._cols)] for _ in range(self._rows)]
         for i, row in enumerate(self.board):
             for j, elem in enumerate(row):
-                self.render_cell(screen, elem, (i, j))
+                for entity in elem:
+                    new_board[i][j].append(str(type(entity)))
 
-    def render_cell(self, screen, cell, pos):
-        pygame.draw.rect(screen, pygame.Color('Black'),
-                         ((self._left + self._cell_size * pos[1], self._top + self._cell_size * pos[0]),
-                          (self._cell_size, self._cell_size)), 1)
-
-        for sprite in cell:
-            sprite.rect.x = self._left + self._cell_size * pos[1] + 2
-            sprite.rect.y = self._top + self._cell_size * pos[0] + 2
+        return new_board
 
     def check_grassfeeding(self):
         return self.grassfeeding_count
@@ -87,4 +74,3 @@ class Board:
 
     def click(self, left, top):
         pos = self.get_cell(left, top)
-

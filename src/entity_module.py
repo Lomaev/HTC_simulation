@@ -1,8 +1,7 @@
-import pygame
 import os
 import random
 
-
+'''
 def load_image(name, colorkey=None):
     print(name, 'loaded.')
     if type(name) != str:
@@ -32,11 +31,11 @@ class ImageLoader:
             cls.img = load_image(image_name, colorkey=-1)
 
         return cls.img
+'''
 
 
-class BaseAnimal(pygame.sprite.Sprite, ImageLoader):
-    def __init__(self, group, power, name):
-        super().__init__(group)
+class BaseAnimal:
+    def __init__(self, power, name):
         self.alive = True
         self.power = power
         self.name = name
@@ -60,10 +59,8 @@ class BaseAnimal(pygame.sprite.Sprite, ImageLoader):
 
 
 class SmallPredator(BaseAnimal):
-    def __init__(self, group, power, name, size):
-        super().__init__(group, power, name)
-        self.image = pygame.transform.scale(self.get_class_image('cat.jpg'), (size, size))
-        self.rect = self.image.get_rect()
+    def __init__(self, power, name):
+        super().__init__(power, name)
 
     def check_interaction(self, target):
         if type(target) == GrassFeeding and target.alive and target.power < self.power:
@@ -79,10 +76,8 @@ class SmallPredator(BaseAnimal):
 
 
 class GrassFeeding(BaseAnimal):
-    def __init__(self, group, power, name, size):
-        super().__init__(group, power, name)
-        self.image = pygame.transform.scale(self.get_class_image('grass-feeding.jpg'), (size, size))
-        self.rect = self.image.get_rect()
+    def __init__(self, power, name):
+        super().__init__(power, name)
 
     def check_interaction(self, target):
         if type(target) == Plant and target.alive:
@@ -98,10 +93,8 @@ class GrassFeeding(BaseAnimal):
 
 
 class BigPredator(BaseAnimal):
-    def __init__(self, group, power, name, size):
-        super().__init__(group, power, name)
-        self.image = pygame.transform.scale(self.get_class_image('lion.jpg'), (size, size))
-        self.rect = self.image.get_rect()
+    def __init__(self, power, name):
+        super().__init__(power, name)
 
     def check_interaction(self, target):
         if target is self:
@@ -125,12 +118,9 @@ class BigPredator(BaseAnimal):
             return False
 
 
-class Plant(pygame.sprite.Sprite, ImageLoader):
-    def __init__(self, group, food_value, name, size):
-        super().__init__(group)
+class Plant:
+    def __init__(self, food_value, name):
         self.alive = True
-        self.image = pygame.transform.scale(self.get_class_image('plant.jpg'), (size, size))
-        self.rect = self.image.get_rect()
         self.food_value = food_value
         self.name = name
 
@@ -141,11 +131,8 @@ class Plant(pygame.sprite.Sprite, ImageLoader):
         return True
 
 
-class Watcher(pygame.sprite.Sprite, ImageLoader):
-    def __init__(self, group, name, size):
-        super().__init__(group)
-        self.image = pygame.transform.scale(self.get_class_image('man.jpg'), (size, size))
-        self.rect = self.image.get_rect()
+class Watcher:
+    def __init__(self, name):
         self.name = name
 
     def move(self, i, j, rows, cols):

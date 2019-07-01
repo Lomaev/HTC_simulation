@@ -1,49 +1,45 @@
-import pygame
+# import pygame
 import random
+from flask import Flask, render_template, request, session, jsonify
 from board_module import Board
 from entity_module import *
 
-n = 20
+app = Flask(__name__)
 
-pygame.init()
+board = Board(1, 1, 0)
 
-screen = pygame.display.set_mode((700, 700))
 
-all_sprites = pygame.sprite.Group()
+@app.route('/board', methods=['POST'])
+def new_board():
+    global board
 
-board = Board(n, n, 35, 0, 0, 3, all_sprites)
+    try:
+        n, m = 5, 5
 
-for i in range(3):
-    board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(GrassFeeding(all_sprites, random.randint(0, 20), str(i+4), 35))
-for i in range(3):
-    board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(SmallPredator(all_sprites, random.randint(50, 200), str(i+1), 35))
-for i in range(2):
-    board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(BigPredator(all_sprites, random.randint(200, 300), str(i+7), 35))
-for i in range(5):
-    board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(Plant(all_sprites, random.randint(0, 40), 'kust', 35))
-board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(Watcher(all_sprites, 'Man', 35))
+        board = Board(n, m, 3)
 
-#board.board[random.randint(0, n-1)][random.randint(0, n-1)].append(Watcher(all_sprites, 'Test', 65))
+        for i in range(3):
+            board.board[random.randint(0, n - 1)][random.randint(0, m - 1)].append(
+                GrassFeeding(random.randint(0, 20), str(i + 4)))
+        for i in range(3):
+            board.board[random.randint(0, n - 1)][random.randint(0, m - 1)].append(
+                SmallPredator(random.randint(50, 200), str(i + 1)))
+        for i in range(2):
+            board.board[random.randint(0, n - 1)][random.randint(0, m - 1)].append(
+                BigPredator(random.randint(200, 300), str(i + 7)))
+        for i in range(5):
+            board.board[random.randint(0, n - 1)][random.randint(0, m - 1)].append(Plant(random.randint(0, 40), 'kust'))
+        board.board[random.randint(0, n - 1)][random.randint(0, m - 1)].append(Watcher('Man'))
 
-move_clock = pygame.time.Clock()
-move_time = 0
-while True:
-    screen.fill(pygame.Color('White'))
-    board.render(screen)
-    all_sprites.draw(screen)
+        return 'OK.'
+    except:
+        return 'Error!'
 
-    events = pygame.event.get()
-    for event in events:
-        if event.type == pygame.QUIT:
-            exit(0)
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            board.move()
-            board.interact()
 
-    move_time += move_clock.tick()
-    if move_time > 100 and board.check_grassfeeding():
-        move_time = 0
-        board.move()
-        board.interact()
+@app.route('/board/', methods=['GET'])
+def get_board_now():
+    return jsonify(board.to_json_model())
 
-    pygame.display.flip()
+
+if __name__ == '__main__':
+    app.run(port=80, host='127.0.0.1')
