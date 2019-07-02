@@ -1,9 +1,10 @@
 import os
 import random
+from log_module import print_to_log
 
 '''
 def load_image(name, colorkey=None):
-    print(name, 'loaded.')
+    print_to_log(name, 'loaded.')
     if type(name) != str:
         fullname = os.path.join('data', *name)
     else:
@@ -18,7 +19,7 @@ def load_image(name, colorkey=None):
             image = image.convert_alpha()
         return image
     except pygame.error as message:
-        print('Cannot load image:', name)
+        print_to_log('Cannot load image:', name)
         raise SystemExit(message)
 
 
@@ -41,7 +42,7 @@ class BaseAnimal:
         self.name = name
 
     def move(self, i, j, rows, cols):
-        print('Animal', self.name, 'moved from', i, j, 'to', end=' ')
+        old_coords = str(i) + ' ' + str(j)
         off_i, off_j = random.choice([(-1, 0), (1, 0), (0, -1), (0, 1)])
         i += off_i
         j += off_j
@@ -53,7 +54,7 @@ class BaseAnimal:
             j = cols + j
         elif j == cols:
             j = 0
-        print(i, j)
+        print_to_log('Animal', self.name, 'moved from', old_coords, 'to', i, j)
 
         return i, j
 
@@ -64,7 +65,7 @@ class SmallPredator(BaseAnimal):
 
     def check_interaction(self, target):
         if type(target) == GrassFeeding and target.alive and target.power < self.power:
-            print('Small predator', self.name, 'eat', target.name)
+            print_to_log('Small predator', self.name, 'eat', target.name)
             if self.power + target.power // 2 < 200:
                 self.power += target.power // 2
             else:
@@ -81,7 +82,7 @@ class GrassFeeding(BaseAnimal):
 
     def check_interaction(self, target):
         if type(target) == Plant and target.alive:
-            print('Grass feeding', self.name, 'eat plant', target.name)
+            print_to_log('Grass feeding', self.name, 'eat plant', target.name)
             if self.power + target.food_value < 400:
                 self.power += target.food_value
             else:
@@ -101,7 +102,7 @@ class BigPredator(BaseAnimal):
             return False
         if (type(target) == GrassFeeding or type(
                 target) == SmallPredator) and target.alive and target.power < self.power:
-            print('Big predator', self.name, 'eat', type(target), 'with power', target.power)
+            print_to_log('Big predator', self.name, 'eat', type(target), 'with power', target.power)
             if self.power + target.power // 2 < 300:
                 self.power += target.power // 2
             else:
@@ -109,7 +110,7 @@ class BigPredator(BaseAnimal):
             target.alive = False
             return True
         elif type(target) == BigPredator and random.randint(0, 1):
-            print('Big predator', self.name, 'hit', target.name, 'decreasing his power by', self.power // 2)
+            print_to_log('Big predator', self.name, 'hit', target.name, 'decreasing his power by', self.power // 2)
             target.power -= self.power // 2
             if target.power <= 0:
                 target.alive = False
@@ -134,15 +135,16 @@ class Plant:
 class Watcher:
     def __init__(self, name):
         self.name = name
+        self.alive = True
 
     def move(self, i, j, rows, cols):
         new_i, new_j = random.randint(0, rows - 1), random.randint(0, cols - 1)
-        print('Watcher', self.name, 'moved from', i, j, 'to', new_i, new_j)
+        print_to_log('Watcher', self.name, 'moved from', i, j, 'to', new_i, new_j)
         return new_i, new_j
 
     def check_interaction(self, target):
         if target is not self and target.alive:
-            print('Watcher', self.name, 'see', type(target), 'and name it', target.name)
+            print_to_log('Watcher', self.name, 'see', type(target), 'and name it', target.name)
         if type(target) == Plant:
             target.alive = False
         return False

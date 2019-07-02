@@ -1,6 +1,7 @@
 # import pygame
 import random
 from entity_module import *
+from log_module import print_to_log
 
 
 class Board:
@@ -35,11 +36,9 @@ class Board:
                     elif type(entity) == Plant:
                         new_board[random.randint(0, self._rows - 1)][random.randint(0, self._cols - 1)].append(
                             Plant(random.randint(0, 40), random.randint(100, 200)))
-                        entity.kill()
                     else:
                         if type(entity) == GrassFeeding:
                             self.grassfeeding_count -= 1
-                        entity.kill()
 
         self.board = new_board
 
@@ -48,29 +47,9 @@ class Board:
         for i, row in enumerate(self.board):
             for j, elem in enumerate(row):
                 for entity in elem:
-                    new_board[i][j].append(str(type(entity)))
+                    new_board[i][j].append(entity.__class__.__name__)
 
         return new_board
 
     def check_grassfeeding(self):
         return self.grassfeeding_count
-
-    def get_cell(self, left, top):
-        top_cell = (top - self._top) // self._cell_size
-        left_cell = (left - self._left) // self._cell_size
-        if 0 <= top_cell < self._cols and 0 <= left_cell < self._rows:
-            return top_cell, left_cell
-        else:
-            return None
-
-    def get_item(self, row, col):
-        if 0 < row < self._rows and 0 < col < self._cols:
-            return self.board[row][col]
-        else:
-            return None
-
-    def set_item(self, col, row, item):
-        self.board[row][col] = item
-
-    def click(self, left, top):
-        pos = self.get_cell(left, top)

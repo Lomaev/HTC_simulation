@@ -3,6 +3,7 @@ import random
 from flask import Flask, render_template, request, session, jsonify
 from board_module import Board
 from entity_module import *
+from log_module import print_to_log, get_log, clear_log
 
 app = Flask(__name__)
 
@@ -31,6 +32,8 @@ def new_board():
             board.board[random.randint(0, n - 1)][random.randint(0, m - 1)].append(Plant(random.randint(0, 40), 'kust'))
         board.board[random.randint(0, n - 1)][random.randint(0, m - 1)].append(Watcher('Man'))
 
+        clear_log()
+
         return 'OK.'
     except:
         return 'Error!'
@@ -38,7 +41,19 @@ def new_board():
 
 @app.route('/board/', methods=['GET'])
 def get_board_now():
+    return render_template('index.html')
+
+
+@app.route('/board/next', methods=['GET'])
+def step():
+    board.move()
+    board.interact()
     return jsonify(board.to_json_model())
+
+
+@app.route('/board/logs', methods=['GET'])
+def logs():
+    return jsonify(get_log())
 
 
 if __name__ == '__main__':
