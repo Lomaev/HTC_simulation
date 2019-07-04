@@ -36,20 +36,27 @@ def new_board():
 
         clear_log()
 
-        return 'OK.'
+        print(board.to_json_model())
+        print(jsonify(board.to_json_model()))
+        return jsonify(board.to_json_model())
     except Exception as exep:
         print(exep)
         return 'Error!'
 
 
 @app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+
 @app.route('/board/', methods=['GET'])
 def get_board_now():
-    return render_template('index.html')
+    return jsonify(board.to_json_model())
 
 
 @app.route('/board/next', methods=['GET'])
 def step():
+    clear_log()
     board.move()
     board.interact()
     return jsonify(board.to_json_model())

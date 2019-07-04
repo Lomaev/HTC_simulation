@@ -4,7 +4,7 @@ log = []
 def print_to_log(*args):
     global log
     try:
-        log.append(' '.join(str(i) for i in args))
+        log.append(' '.join(str(i) for i in args) + '<br>')
     except Exception:
         log.append('Incorrect log message.')
 
@@ -12,5 +12,7 @@ def print_to_log(*args):
 def get_log():
     return log
 
+
 def clear_log():
+    global log
     log = []
